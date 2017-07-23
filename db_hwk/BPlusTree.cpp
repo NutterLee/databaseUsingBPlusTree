@@ -138,6 +138,15 @@ bool BPlusTree::remove(int key)
 			return true;
 		}
 	}
+	setHead();
+}
+
+bool BPlusTree::modify(int key, int value)
+{
+	auto tmp_ptr = search(key);
+	if(tmp_ptr==nullptr)	return false;
+	else (*tmp_ptr).second = value;
+	return true;
 }
 
 void BPlusTree::setHead()
@@ -170,6 +179,20 @@ void BPlusTree::updateParent(interiorNode * this_node, int key)
 	this_node->setTrueNum(this_node->keys.size());
 	//TODO 待完成
 
+}
+
+interiorNode * BPlusTree::getFloorFirstNode()
+{
+	interiorNode* this_node = root;
+	if (this_node == nullptr) return nullptr;
+	else
+	{
+		while (this_node->children.size() != 0)
+		{
+			this_node = this_node->children[0];
+		}
+		return this_node;
+	}
 }
 
 interiorNode * BPlusTree::moveToLeaf(int key)
@@ -373,8 +396,10 @@ void BPlusTree::solveUnderflow(interiorNode * this_node, int key)
 	//case 1 p是根节点
 	if (this_node == root)
 	{
-		if (this_node->getTrueNum() == 0) root = nullptr;
-		return;
+		if (this_node->getTrueNum() == 0)
+			delete root;
+			root = nullptr;
+			return;
 	}
 	//不是根节点
 	//step1 看看左邻居的情况
@@ -431,7 +456,10 @@ void BPlusTree::solveUnderflow(interiorNode * this_node, int key)
 			{
 				this_node->getParent()->setTrueNum(this_node->getParent()->keys.size());
 			}
+			solveInnerUnderflow(this_node->getParent(), key);
 			//合并this_node和左孩子
+			delete this_node;
+			this_node = nullptr;
 		}
 		else if(rightSibling!=nullptr&&(this_node->getTrueNum()+rightSibling->getTrueNum())<= this_node->getLimitNum())
 		{
@@ -451,10 +479,12 @@ void BPlusTree::solveUnderflow(interiorNode * this_node, int key)
 			{
 				this_node->getParent()->setTrueNum(this_node->getParent()->keys.size());
 			}
+			solveInnerUnderflow(this_node->getParent(), key);
+			delete rightSibling;
+			rightSibling = nullptr;
 		}
 		//更新父节点的children
 		//更新父节点的索引
-		solveInnerUnderflow(this_node->getParent(),key);
 	}
 }
 
@@ -524,7 +554,9 @@ void BPlusTree::solveInnerUnderflow(interiorNode * this_node,int key)
 				(this_node->getParent())->setTrueNum((this_node->getParent())->keys.size());
 				leftSibling->setTrueNum(leftSibling->keys.size());
 				//合并this_node和左孩子
+				auto tmp_ptr = this_node;
 				this_node = this_node->getParent();
+				delete tmp_ptr;
 			}
 			else if (rightSibling != nullptr && (this_node->getTrueNum() + rightSibling->getTrueNum()) <= this_node->getLimitNum())
 			{
@@ -538,6 +570,7 @@ void BPlusTree::solveInnerUnderflow(interiorNode * this_node,int key)
 				(this_node->getParent())->setTrueNum((this_node->getParent())->keys.size());
 				this_node->setTrueNum(this_node->keys.size());
 				this_node = this_node->getParent();
+				delete rightSibling;
 			}
 		}
 	}

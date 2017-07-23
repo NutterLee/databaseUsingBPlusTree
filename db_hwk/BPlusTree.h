@@ -22,8 +22,15 @@ public:
 	//遍历打印出所存的key value键值对,num是要打印的数据数目
 	//超过了内在的数目则打印出全部的内容
 	void traverse(int num);
+	int getM() { return M; }
+	int getSize() { return size; }
+
+	friend void saveToFile(BPlusTree & tree);
+	friend void readFromFile(BPlusTree& tree, string filename);
 
 private:
+	void setSize(int num) { size = num; }
+	void setM(int m) { M = m; }
 	//解决一切overflow问题，处理完叶子节点的overflow以后要递归调用非叶子结点的overflow
 	//注意： 两个overflow的标准似乎不同？一个是key的数目，一个是item的数目（虽然把他们都设置成一样了）
 	void solveOverflow(interiorNode*);
@@ -36,10 +43,14 @@ private:
 	//函数说明：更新父节点，再删除后使用
 	//功能 删除父辈中可能存在的key值，不引发underflow，潜在的underflow由其函数单独检查
 	void updateParent(interiorNode* node, int key);
+	void setRootID(string _id) { rootID = _id; }
+	string getRootID() { return rootID; }
+	interiorNode* getFloorFirstNode();
 	int size;
 	//M是阶数
 	int M;
 	interiorNode* root;
 	//叶子节点链表头
 	interiorNode* head;
+	string rootID;
 };

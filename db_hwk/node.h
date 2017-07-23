@@ -17,6 +17,7 @@ using namespace std;
 class interiorNode
 {
 	friend class BPlusTree;
+	//void saveToFile(BPlusTree & tree);
 public:
 	interiorNode();
 	virtual string getType() { return "interiorNode"; }
@@ -38,7 +39,7 @@ public:
 	virtual interiorNode* mergeWithRightSibling(interiorNode* this_node, interiorNode* rightSibling);
 
 	virtual ~interiorNode();
-	//为了能让interiorNode的指针访问leafNode内部的数据而设计的函数，在interiorNode里面不做任何事情
+	//为了能让interiorNode的指针访问leafNode内部的数据而设计的函数
 	virtual vector<pair<int, int>>& getData() 
 	{
 		throw dataError();
@@ -68,6 +69,14 @@ public:
 	virtual interiorNode* getRightSibling(interiorNode* this_node);
 	static int num_of_keys ;
 	static void setM(int num) ; 
+	vector<int>& getKeys() { return keys; }
+	string id;
+	virtual string getID() { return id; }
+	virtual void setID(string num) { id = num; }
+	virtual interiorNode* getNextParent(interiorNode* this_node);
+	friend void saveToFile(BPlusTree & tree);
+	friend void readFromFile(BPlusTree& tree, string filename);
+
 
 private:
 	int true_num_of_keys;
@@ -110,6 +119,11 @@ public:
 	}
 	virtual interiorNode* mergeWithLeftSibling(interiorNode* leftSibling, interiorNode* this_node);
 	virtual interiorNode* mergeWithRightSibling(interiorNode* this_node, interiorNode* rightSibling);
+	string id;
+	virtual string getID() { return id; }
+	virtual void setID(string num) { id = num; }
+	friend void saveToFile(BPlusTree & tree);
+	friend void readFromFile(BPlusTree& tree, string filename);
 
 private:
 	int true_num_of_items;
