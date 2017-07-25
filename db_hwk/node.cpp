@@ -111,16 +111,14 @@ int interiorNode::insert(int key, int value)
 	if (pos == 0) keys.insert(iter, key);
 	else
 	{
-		for (int i = 0; i <= pos; i++)
-		{
-			iter++;
-			if (iter == keys.end())
+		iter = iter + pos;
+		if (iter == keys.end())
 			{
 				keys.push_back(key);
 				true_num_of_keys++;
 				return pos;
 			}
-		}
+		
 		keys.insert(iter, key);
 	}
 	true_num_of_keys++;
@@ -165,14 +163,20 @@ interiorNode * interiorNode::getRightSibling(interiorNode * this_node)
 	}
 	//search_pos是为了找兄弟，当前指针在其parent的children里面的下标
 	int search_pos = (this_node->parent)->search((this_node->keys)[0]);
-	if (search_pos >(this_node->parent)->keys.size() - 1&& (this_node->parent)->keys.size()!=1) return nullptr;
+	if ((this_node->parent)->keys.size() == 1)
+	{
+		if (this_node->getParent()->find((this_node->keys)[0]) == -1 && search_pos == 0) return (this_node->getParent())->children[1];
+		else return nullptr;
+	}
 	if (this_node->getParent()->find((this_node->keys)[0]) == -1)
 	{
-		return (this_node->getParent())->getChildren()[search_pos + 1];
+		if (search_pos >= this_node->getParent()->keys.size()) return nullptr;
+		else return (this_node->getParent())->children[search_pos + 1];
 	}
 	else
 	{
-		return (this_node->getParent())->getChildren()[search_pos + 2];
+		if (search_pos >= this_node->getParent()->keys.size()-1) return nullptr;
+		else return (this_node->getParent())->getChildren()[search_pos + 2];
 	}
 }
 
@@ -269,7 +273,7 @@ int leafNode::insert(int key, int value)
 			true_num_of_items++;
 			return pos;
 		}
-		else		items.insert(iter, to_do);
+		else	 items.insert(iter, to_do);
 	}
 	true_num_of_items++;
 	return pos;
@@ -317,7 +321,7 @@ interiorNode * leafNode::getRightSibling(interiorNode * this_node)
 	}
 	//search_pos是为了找兄弟，当前指针在其parent的children里面的下标
 	int search_pos = (this_node->getParent())->search((this_node->getData())[0].first);
-	if (search_pos >= (this_node->getParent()->getChildren().size() - 2)) return nullptr;
+	if (search_pos >=(this_node->getParent()->getChildren().size() - 2)) return nullptr;
 	if (this_node->getParent()->find((this_node->getData())[0].first) == -1)
 	{
 		return (this_node->getParent())->getChildren()[search_pos + 1];

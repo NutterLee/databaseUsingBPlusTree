@@ -25,8 +25,6 @@ bool BPlusTree::insert(int key, int value)
 	auto pos = search(key);
 	if(pos!=nullptr)	return false;
 	interiorNode* this_node = moveToLeaf(key);
-	//TODO 如何插入/?????
-	//TODO 连接各个节点呢？？ test done
 	this_node->insert(key, value);
 	solveOverflow(this_node);
 	size++;

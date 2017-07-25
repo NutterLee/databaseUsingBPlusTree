@@ -10,3 +10,13 @@ class itemNumError{};
 class dataError{};
 //leaf和interior的virtual本身访问错误
 class nodeTypeError{};
+//key和value大小超过9位
+class  outOfRange {};
+//缓存的数据大小错误
+class cacheLengthError{};
+//写缓存的命令错误
+class operationError{};
+//读取文件错误
+class fileError{};
+//其他错误
+class unexpectedError{};

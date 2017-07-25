@@ -9,8 +9,6 @@
 #include<map>
 #include<algorithm>
 using namespace std;
-
-
 //readBuffer本质上是一个unordered_map
 //其中的node除了记录key和value之外 还记录了被访问的次数
 //未达到容量上限时 与正常map一样使用
@@ -24,22 +22,16 @@ class readBufferNode
 public:
 	friend class readBuffer;
 	readBufferNode() { value = 0; visited_times == 0; }
-	readBufferNode(int _value)
-	{
-		value = _value;
-		visited_times++;
-	}
-	void setValue(int _value)
-	{
-		value = _value;
-		visited_times++;
-	}
+	readBufferNode(int _value, int _offPos);	
+	readBufferNode(int _value);
+	void setValue(int _value,int _offPos);
+	void setValue(int _value);
 	int value;
 	int visited_times = 0;
+	int offPos;
 };
 
 bool cmp_nodes(const pair<int, readBufferNode> node1, const pair<int, readBufferNode>node2);
-
 
 class readBuffer
 {
@@ -53,25 +45,55 @@ public:
 	readBuffer() { nodes = new map<int, readBufferNode>; size = 5000; }
 	~readBuffer() { delete nodes; }
 	//如果之前已经有此key存在了 不作任何事情 返回false
-	bool add(int key, int value);	
+	bool add(int key, int value, int offPos);
+	bool add(int key, int value);
+	//不管key是否存在都会写入
+	void modify(int key, int value, int offPos);
 	void modify(int key, int value);
 	//调用remove前要保证nodes里面有key
 	bool remove(int key);
 	//找不到返回nullptr 否则返回对应的
 	int* search(int key);
-
+	friend class database;
+	void clear();
+	
 private:
 	map<int, readBufferNode>* nodes;
 	int size;
 };
 
+class writeBufferNode
+{
+public:
+	//operation分为"add" "modify" "remove"
+	string operataion;
+	int offPos;
+	int size;
+	string new_info;
+	int key;
+	int value;
+};
 class writeBuffer
 {
 public:
+	writeBuffer();
+	int* search(int key);
+	writeBufferNode* search_pro(int key);
+	bool modify(int key, int value);
+	bool add(int key, int value, string oper, int offpos);
+	//此函数无论存不存在都会添加或者修改
+	bool add_pro(int key, int value, string oper, int offpos);
+	void setBufferSize(int _size){size = _size;}
+	int getSize() { return size; }
+	void refresh();
+	void remove(int key);
+	int getTrueSize();
+	map<int, writeBufferNode>& getData();
+	void clear();
+
 
 private:
-	//operation分为"add"
-	string operataion;
 	//TODO待补完
-
+	map<int, writeBufferNode> inner_nodes;
+	int size;
 };
